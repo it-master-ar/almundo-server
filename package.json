@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node index",
+    "start": "PORT=9999 node index",
     "dev": "nodemon index",
     "debug": "node-debug index.js",
     "lint": "eslint . --ext .js"

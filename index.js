@@ -1,17 +1,22 @@
-// cargar modulo http
 const http = require('http')
+const config = require('./config')
 
 // crear un web server que responde "Hello Server" a todos los requests.
 const server = http.createServer((req, res) => {
   res.writeHead(200, {'Content-Type': 'text/plain'})
-  res.write('Algo..')
+
+  const body = []
+  req.on('data', (chunk) => {
+    console.log('Request Body', chunk.toString())
+    body.push(chunk)
+  })
+
+  req.on('end', () => {
+    console.log('END', body.toString())
+    res.end(body.toString())
+  })
 })
 
-server.on('request', (req, res) => {
-  res.end('Hello Server!')
-})
-
-// attachar el servidor al puerto 8000
-server.listen(8000, () => {
-  console.log('Server running at :8000')
+server.listen(config.port, () => {
+  console.log(`Server running at :${config.port}`)
 })
