@@ -1,36 +1,41 @@
 const Router = require('express').Router
 const router = new Router()
 
-const root = { name: 'root' }
-const user1 = { name: 'Juan1' }
-const user2 = { name: 'Juan2' }
-const user3 = { name: 'Juan3' }
+const db = require('../db')
+const User = db.mongoose.model('User')
 
-const users = [user1, user2, user3]
+const root = { name: 'root' }
 
 router.get('/', (req, res) => {
-  res.send(users)
+  User.find({}, (err, result) => {
+    if (err) { return res.status(500).send(err) }
+
+    res.send(result)
+  })
 })
 
 router.get('/root', (req, res) => {
   res.send(root)
 })
 
-router.get('/:name', (req, res, next) => {
-  const user = users.find(u =>
-    u.name === req.params.name
-  )
+router.get('/:id', (req, res, next) => {
+  User.findById(req.params.id, (err, user) => {
+    if (err) { return res.status(500).send(err) }
 
-  if (!user) {
-    const err = {
-      statusCode: 404,
-      resource: 'user'
-    }
+    if (!user) { return res.send(404) }
 
-    return next(err)
-  }
+    res.send(user)
+  })
+})
 
-  res.send(user)
+router.post('/', (req, res) => {
+  const user = new User(req.body)
+
+  user.save((err, result) => {
+    if (err) { return res.status(500).send(err) }
+
+    res.send(result)
+  })
 })
 
 module.exports = router
